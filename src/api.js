@@ -9,9 +9,15 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 router.get("/", (req, res) => {
-  res.json({
-    hello: "hi",
-  });
+  res.json([{
+    name: "index",
+    directory: "https://nodemailer-serverless.netlify.app/.netlify/functions/api/"
+  },
+  {
+    name: "nodemailer API",
+    directory: "https://nodemailer-serverless.netlify.app/.netlify/functions/api/mail"
+  }
+]);
 });
 
 router.post("/mail", async (req, res) => {
