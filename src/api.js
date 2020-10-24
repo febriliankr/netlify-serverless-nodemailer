@@ -15,44 +15,53 @@ router.get("/", (req, res) => {
   },
   {
     name: "nodemailer API",
-    directory: "https://nodemailer-serverless.netlify.app/.netlify/functions/api/mail"
+    directory: "https://`nodemailer-serverless.netlify.app/.netlify/functions/api/mail"
   }
 ]);
 });
 
+const emailAddress = process.env.EMAIL;
+const password = process.env.PASSWORD;
+
 router.post("/mail", async (req, res) => {
-  console.log("req", req.body);
-  const { email } = req.body;
+  console.log("req.body", req.body);
+  if (req.method === "POST") {
+    // Process a POST request
+    const { name, phone } = req.body;
 
-  let transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false,
-    auth: {
-      user: "milford.marquardt@ethereal.email",
-      pass: "Rcer1ezEHjCZEpDV5V",
-    },
-  });
+    let transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: emailAddress,
+        pass: password
+      },
+    });
 
-  const message = {
-    from: '"Serverless Nodemailing" <febrilian.kr@gmail.com>', // sender address
-    to: `${email}`, // list of receivers
-    subject: "Serverless is ON, Baby", // Subject line
-    text: "Hello, long time no see.", // plain text body
-    html: "<b>Hello, long time no see.</b>", // html body
-  };
+    const message = {
+      from: '"SenaraiCerita Form Submission" <febrilian.kr@gmail.com>', // sender address
+      to: `febrilian.kr@gmail.com`, // list of receivers
+      subject: name, // Subject line
+      text: `New order from ${name}, contact through ${phone}. Click this link https://wa.me/62${phone} to automatically be redirected to whatsapp app.`, // plain text body
+      html: `New order from ${name}, contact through ${phone}. Click this link https://wa.me/62${phone} to automatically be redirected to whatsapp app.`, // html body
+    };
 
-  // send mail with defined transport object
-  const info = await transporter.sendMail(message);
+    // send mail with defined transport object
+    const info = await transporter.sendMail(message);
 
-  console.log("Message sent: %s", info.messageId);
-  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+    console.log("Message sent: %s", info.messageId);
+    // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
 
-  // Preview only available when sending through an Ethereal account
-  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    // Preview only available when sending through an Ethereal account
+    console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 
-  res.send(`Email sent!`);
+    res.send({
+      success: true,
+      message: `Terima kasih, ${name}! Kami akan segera menghubungi melalui WhatsApp Anda di ${phone}`
+    });
+  }
 });
 
 module.exports.handler = serverless(app);
